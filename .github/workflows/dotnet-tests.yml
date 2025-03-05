@@ -32,9 +32,3 @@ jobs:
 
     - name: Run tests
       run: dotnet test ./Quizlet.Tests/Quizlet.Tests.csproj --no-build --configuration Release --logger trx --results-directory TestResults
-
-    - name: Upload test results 
-      uses: actions/upload-artifact@v3
-      with:
-        name: test-results
-        path: TestResults
