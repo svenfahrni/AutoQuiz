@@ -5,6 +5,8 @@ VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Quizlet", "Quizlet\Quizlet.csproj", "{7A4AAE57-190F-41C1-BCF2-51DE12B982F1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quizlet.Tests", "Quizlet.Tests\Quizlet.Tests.csproj", "{9FD5AD2D-2F98-992E-D681-3CD4035143DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{7A4AAE57-190F-41C1-BCF2-51DE12B982F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A4AAE57-190F-41C1-BCF2-51DE12B982F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A4AAE57-190F-41C1-BCF2-51DE12B982F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FD5AD2D-2F98-992E-D681-3CD4035143DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FD5AD2D-2F98-992E-D681-3CD4035143DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FD5AD2D-2F98-992E-D681-3CD4035143DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FD5AD2D-2F98-992E-D681-3CD4035143DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
