@@ -19,6 +19,9 @@ if (app.Environment.IsDevelopment())
    });
 }
     
+app.UseStaticFiles();
+app.UseDefaultFiles();
+app.MapFallbackToFile("index.html");
 app.MapGet("/", () => "Hello World!");
     
 app.Run();
