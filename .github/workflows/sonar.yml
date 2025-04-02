@@ -37,7 +37,7 @@ jobs:
         run: |
           New-Item -Path .\.sonar\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner 
-          dotnet tool install --global dotnet-coverage --tool-path .\.sonar\coverage
+          dotnet tool install dotnet-coverage --tool-path .\.sonar\coverage
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
