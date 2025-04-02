@@ -11,7 +11,7 @@ public class FileController(IFileService fileService) : ControllerBase
     public async Task<IActionResult> UploadFile(IFormFile? formFile)
     {
         // Validate the content
-        if (formFile == null || formFile.Length == 0) 
+        if (formFile == null || formFile.Length == 0)
         {
             Console.WriteLine("No file uploaded.");
             return BadRequest(new { message = "No file uploaded." });
@@ -20,14 +20,14 @@ public class FileController(IFileService fileService) : ControllerBase
         // Validate the file type
         var allowedExtensions = new[] { ".txt", ".pdf", ".docx" };
         var fileExtension = Path.GetExtension(formFile.FileName).ToLowerInvariant();
-        if (!allowedExtensions.Contains(fileExtension)) 
+        if (!allowedExtensions.Contains(fileExtension))
         {
             Console.WriteLine("Invalid file type. Only .txt, .pdf, and .docx files are allowed.");
             return BadRequest(new { message = "Invalid file type. Only .txt, .pdf, and .docx files are allowed." });
         }
 
         var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
-        var tempFilePath   = Path.Combine(Path.GetTempPath(), uniqueFileName);
+        var tempFilePath = Path.Combine(Path.GetTempPath(), uniqueFileName);
 
         try
         {
@@ -35,7 +35,7 @@ public class FileController(IFileService fileService) : ControllerBase
             {
                 await formFile.CopyToAsync(stream);
             }
-            
+
             var content = await fileService.ReadFileContentAsync(tempFilePath);
 
             return Ok(new { content });
@@ -47,10 +47,7 @@ public class FileController(IFileService fileService) : ControllerBase
         }
         finally
         {
-            if (System.IO.File.Exists(tempFilePath))
-            {
-                System.IO.File.Delete(tempFilePath);
-            }
+            if (System.IO.File.Exists(tempFilePath)) System.IO.File.Delete(tempFilePath);
         }
     }
 }
