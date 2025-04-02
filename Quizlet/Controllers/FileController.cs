@@ -34,7 +34,9 @@ namespace Quizlet.Controllers
             }
 
             // Save the file to a temporary location
-            var tempFilePath = Path.Combine(Path.GetTempPath(), formFile.FileName);
+            var safeFileName = Path.GetFileName(formFile.FileName);
+            var uniqueFileName = $"{Guid.NewGuid()}_{safeFileName}";
+            var tempFilePath = Path.Combine(Path.GetTempPath(), uniqueFileName);
             using (var stream = new FileStream(tempFilePath, FileMode.Create))
             {
                 await formFile.CopyToAsync(stream);
