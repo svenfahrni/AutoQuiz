@@ -31,4 +31,5 @@ app.MapFallbackToFile("index.html");
 app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
-app.Run();
+
+await app.RunAsync();
