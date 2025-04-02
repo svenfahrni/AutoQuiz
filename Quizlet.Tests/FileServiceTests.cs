@@ -1,4 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
+using PdfSharp.Drawing;
+using PdfSharp.Pdf;
 using Quizlet.Interfaces;
 using Quizlet.Services;
 
@@ -67,7 +69,40 @@ namespace Quizlet.Tests
             File.Delete(filePath);
         }
 
-        private void CreateDocxFile(string filePath, string content)
+
+        [Fact]
+        public async Task ReadFileContentAsync_ShouldReturnContent_ForPdfFile()
+        {
+            // Arrange
+            var filePath = "testfile.pdf";
+            var expectedContent = "Dies ist ein Testinhalt.";
+            CreatePdfFile(filePath, expectedContent);
+
+            // Act
+            var content = await _fileService.ReadFileContentAsync(filePath);
+
+            // Assert
+            Assert.Equal(expectedContent, content);
+
+            // Cleanup
+            File.Delete(filePath);
+        }
+
+        [Fact]
+        public async Task ReadFileContentAsync_ShouldThrowNotSupportedException_WhenFileTypeIsNotSupported()
+        {
+            // Arrange
+            var filePath = "testfile.invalidfileformat";
+            await File.WriteAllTextAsync(filePath, "Test content");
+
+            // Act & Assert
+            await Assert.ThrowsAsync<NotSupportedException>(() => _fileService.ReadFileContentAsync(filePath));
+
+            // Cleanup
+            File.Delete(filePath);
+        }
+
+        private static void CreateDocxFile(string filePath, string content)
         {
             using (var doc = WordprocessingDocument.Create(filePath, DocumentFormat.OpenXml.WordprocessingDocumentType.Document))
             {
@@ -78,6 +113,21 @@ namespace Quizlet.Tests
                 var run = para.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run());
                 run.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(content));
             }
+        }
+
+        private static void CreatePdfFile(string filePath, string content)
+        {
+            PdfDocument document = new PdfDocument();
+            document.Info.Title = "Test Document";
+            PdfPage page = document.AddPage();
+            XGraphics gfx = XGraphics.FromPdfPage(page);
+            XFont font = new XFont("Verdana", 12);
+            String paragraph = content;
+            gfx.DrawString(paragraph, font, XBrushes.Black,
+                new XPoint(20, 20), 
+                XStringFormats.TopLeft);
+            document.Save(filePath);
+            document.Close();
         }
     }
 }
