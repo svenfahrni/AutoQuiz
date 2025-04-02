@@ -27,12 +27,12 @@ namespace Quizlet.Services
             };
         }
 
-        private async Task<string> ReadTxtFileAsync(string filePath)
+        private static async Task<string> ReadTxtFileAsync(string filePath)
         {
             return await File.ReadAllTextAsync(filePath);
         }
 
-        private string ReadPdfFile(string filePath)
+        private static string ReadPdfFile(string filePath)
         {
             StringBuilder text = new StringBuilder();
 
@@ -49,10 +49,13 @@ namespace Quizlet.Services
             return text.ToString();
         }
 
-        private string ReadDocxFile(string filePath)
+        private static string ReadDocxFile(string filePath)
         {
             using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, false))
             {
+                if (doc.MainDocumentPart?.Document?.Body == null)
+                    throw new InvalidOperationException("The document structure is invalid or missing.");
+
                 return string.Join(Environment.NewLine, doc.MainDocumentPart.Document.Body.Elements<DocumentFormat.OpenXml.Wordprocessing.Paragraph>()
                     .Select(p => p.InnerText));
             }

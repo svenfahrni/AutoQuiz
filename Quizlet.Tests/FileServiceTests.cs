@@ -102,6 +102,21 @@ namespace Quizlet.Tests
             File.Delete(filePath);
         }
 
+        [Fact]
+        public async Task ReadFileContentAsync_ShouldThrowInvalidOperationException_WhenDocxFileStructureIsInvalid()
+        {
+            // Arrange
+            var filePath = "invalidfile.docx";
+            CreateDocxFileWithInvalidStructure(filePath);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() => _fileService.ReadFileContentAsync(filePath));
+
+            // Cleanup
+            File.Delete(filePath);
+        }
+
+
         private static void CreateDocxFile(string filePath, string content)
         {
             using (var doc = WordprocessingDocument.Create(filePath, DocumentFormat.OpenXml.WordprocessingDocumentType.Document))
@@ -112,6 +127,16 @@ namespace Quizlet.Tests
                 var para = body.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Paragraph());
                 var run = para.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run());
                 run.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(content));
+            }
+        }
+
+        private static void CreateDocxFileWithInvalidStructure(string filePath)
+        {
+            using (var doc = WordprocessingDocument.Create(filePath, DocumentFormat.OpenXml.WordprocessingDocumentType.Document))
+            {
+                var mainPart = doc.AddMainDocumentPart();
+                mainPart.Document = new DocumentFormat.OpenXml.Wordprocessing.Document();
+                // Intentionally not adding a body to create an invalid structure
             }
         }
 
