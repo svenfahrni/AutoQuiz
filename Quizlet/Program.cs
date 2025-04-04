@@ -9,7 +9,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1",
         new OpenApiInfo
-            { Title = "AutoQuiz API", Description = "Creating quizzes from your Slides.", Version = "v1" });
+        { Title = "AutoQuiz API", Description = "Creating quizzes from your Slides.", Version = "v1" });
 });
 
 // Register Services

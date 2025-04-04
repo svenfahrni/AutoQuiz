@@ -28,7 +28,11 @@ jobs:
 
     - name: Build the Docker image
       run: |
-        docker build -t svenfahrni/quizlet:latest .
+        docker buildx build \
+          --cache-from svenfahrni/quizlet:latest \
+          --cache-to type=inline \
+          -t svenfahrni/quizlet:latest .
+
 
     # TODO
     #- name: Push the Docker image
