@@ -1,0 +1,10 @@
+.git
+.gitignore
+.github
+.idea
+.vscode
+**/bin
+**/obj
+Quizlet.Tests
+*.sln.DotSettings.user
+README.md
