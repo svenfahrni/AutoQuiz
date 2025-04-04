@@ -38,9 +38,8 @@ jobs:
       - name: Install SonarQube Cloud tools
         run: |
           mkdir -p .sonar/scanner .sonar/coverage
-          dotnet tool install dotnet-sonarscanner --tool-path .sonar/scanner
-          dotnet tool install dotnet-coverage --tool-path .sonar/coverage
-
+          dotnet tool update dotnet-sonarscanner --tool-path .sonar/scanner --add-source https://api.nuget.org/v3/index.json || dotnet tool install dotnet-sonarscanner --tool-path .sonar/scanner --add-source https://api.nuget.org/v3/index.json
+          dotnet tool update dotnet-coverage --tool-path .sonar/coverage --add-source https://api.nuget.org/v3/index.json || dotnet tool install dotnet-coverage --tool-path .sonar/coverage --add-source https://api.nuget.org/v3/index.json
       - name: Begin SonarQube analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
