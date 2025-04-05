@@ -9,8 +9,11 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1",
         new OpenApiInfo
-            { Title = "AutoQuiz API", Description = "Creating quizzes from your Slides.", Version = "v1" });
+        { Title = "AutoQuiz API", Description = "Creating quizzes from your Slides.", Version = "v1" });
 });
+
+// Healthcheck
+builder.Services.AddHealthChecks();
 
 // Register Services
 builder.Services.AddScoped<IFileService, FileService>();
@@ -30,6 +33,7 @@ app.MapFallbackToFile("index.html");
 app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 await app.RunAsync();
 
