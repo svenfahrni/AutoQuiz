@@ -1,15 +1,35 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.Extensions.DependencyInjection;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
+using Quizlet.Interfaces;
+using Quizlet.Readers;
 using Quizlet.Services;
 
 namespace Quizlet.Tests;
 
 public class FileServiceTests
 {
-    private readonly FileService _fileService = new();
+    private readonly ServiceProvider _serviceProvider;
+    private readonly FileService _fileService;
+
+    public FileServiceTests()
+    {
+        var serviceCollection = new ServiceCollection();
+
+        // Registrierung der Strategien
+        serviceCollection.AddTransient<IFileReaderStrategy, TxtFileReader>();
+        serviceCollection.AddTransient<IFileReaderStrategy, PdfFileReader>();
+        serviceCollection.AddTransient<IFileReaderStrategy, DocxFileReader>();
+
+        // Registrierung des FileService
+        serviceCollection.AddTransient<FileService>();
+
+        _serviceProvider = serviceCollection.BuildServiceProvider();
+        _fileService = _serviceProvider.GetRequiredService<FileService>();
+    }
 
     [Fact]
     public async Task ReadFileContentAsync_ShouldThrowArgumentException_WhenFilePathIsNullOrEmpty()
