@@ -12,6 +12,7 @@ builder.Services.AddSwaggerGen(c =>
 
 // Register Services
 builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<ICardDeckGenerationService, CardDeckGenerationServiceOpenAI>();
 
 var app = builder.Build();
 
@@ -27,7 +28,7 @@ if (app.Environment.IsDevelopment())
 app.UseStaticFiles();
 app.UseDefaultFiles();
 app.MapFallbackToFile("index.html");
-
+app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
