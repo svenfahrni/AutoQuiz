@@ -32,33 +32,33 @@ public class FileServiceTests
     }
 
     [Fact]
-    public async Task ReadFileContentAsync_ShouldThrowArgumentException_WhenFilePathIsNullOrEmpty()
+    public void ReadFileContent_ShouldThrowArgumentException_WhenFilePathIsNullOrEmpty()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => _fileService.ReadFileContentAsync(null));
-        await Assert.ThrowsAsync<ArgumentException>(() => _fileService.ReadFileContentAsync(string.Empty));
+        Assert.Throws<ArgumentException>(() => _fileService.ReadFileContent(null));
+        Assert.Throws<ArgumentException>(() => _fileService.ReadFileContent(string.Empty));
     }
 
     [Fact]
-    public async Task ReadFileContentAsync_ShouldThrowFileNotFoundException_WhenFileDoesNotExist()
+    public void ReadFileContent_ShouldThrowFileNotFoundException_WhenFileDoesNotExist()
     {
         // Arrange
         var nonExistentFilePath = "nonexistentfile.txt";
 
         // Act & Assert
-        await Assert.ThrowsAsync<FileNotFoundException>(() => _fileService.ReadFileContentAsync(nonExistentFilePath));
+        Assert.Throws<FileNotFoundException>(() => _fileService.ReadFileContent(nonExistentFilePath));
     }
 
     [Fact]
-    public async Task ReadFileContentAsync_ShouldReturnContent_ForTxtFile()
+    public void ReadFileContent_ShouldReturnContent_ForTxtFile()
     {
         // Arrange
         var filePath = "testfile.txt";
         var expectedContent = "Dies ist ein Testinhalt.";
-        await File.WriteAllTextAsync(filePath, expectedContent);
+        File.WriteAllText(filePath, expectedContent);
 
         // Act
-        var content = await _fileService.ReadFileContentAsync(filePath);
+        var content = _fileService.ReadFileContent(filePath);
 
         // Assert
         Assert.Equal(expectedContent, content);
@@ -68,7 +68,7 @@ public class FileServiceTests
     }
 
     [Fact]
-    public async Task ReadFileContentAsync_ShouldReturnContent_ForDocxFile()
+    public void ReadFileContent_ShouldReturnContent_ForDocxFile()
     {
         // Arrange
         var filePath = "testfile.docx";
@@ -76,7 +76,7 @@ public class FileServiceTests
         CreateDocxFile(filePath, expectedContent);
 
         // Act
-        var content = await _fileService.ReadFileContentAsync(filePath);
+        var content = _fileService.ReadFileContent(filePath);
 
         // Assert
         Assert.Equal(expectedContent, content);
@@ -85,9 +85,8 @@ public class FileServiceTests
         File.Delete(filePath);
     }
 
-
     [Fact]
-    public async Task ReadFileContentAsync_ShouldReturnContent_ForPdfFile()
+    public void ReadFileContent_ShouldReturnContent_ForPdfFile()
     {
         // Arrange
         var filePath = "testfile.pdf";
@@ -95,7 +94,7 @@ public class FileServiceTests
         CreatePdfFile(filePath, expectedContent);
 
         // Act
-        var content = await _fileService.ReadFileContentAsync(filePath);
+        var content = _fileService.ReadFileContent(filePath);
 
         // Assert
         Assert.Equal(expectedContent, content);
@@ -105,33 +104,32 @@ public class FileServiceTests
     }
 
     [Fact]
-    public async Task ReadFileContentAsync_ShouldThrowNotSupportedException_WhenFileTypeIsNotSupported()
+    public void ReadFileContent_ShouldThrowNotSupportedException_WhenFileTypeIsNotSupported()
     {
         // Arrange
         var filePath = "testfile.invalidfileformat";
-        await File.WriteAllTextAsync(filePath, "Test content");
+        File.WriteAllText(filePath, "Test content");
 
         // Act & Assert
-        await Assert.ThrowsAsync<NotSupportedException>(() => _fileService.ReadFileContentAsync(filePath));
+        Assert.Throws<NotSupportedException>(() => _fileService.ReadFileContent(filePath));
 
         // Cleanup
         File.Delete(filePath);
     }
 
     [Fact]
-    public async Task ReadFileContentAsync_ShouldThrowInvalidOperationException_WhenDocxFileStructureIsInvalid()
+    public void ReadFileContent_ShouldThrowInvalidOperationException_WhenDocxFileStructureIsInvalid()
     {
         // Arrange
         var filePath = "invalidfile.docx";
         CreateDocxFileWithInvalidStructure(filePath);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _fileService.ReadFileContentAsync(filePath));
+        Assert.Throws<InvalidOperationException>(() => _fileService.ReadFileContent(filePath));
 
         // Cleanup
         File.Delete(filePath);
     }
-
 
     private static void CreateDocxFile(string filePath, string content)
     {
