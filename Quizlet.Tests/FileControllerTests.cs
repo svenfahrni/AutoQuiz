@@ -6,7 +6,7 @@ using Quizlet.Models;
 
 namespace Quizlet.Tests;
 
-public class UploadTests(WebApplicationFactory<Program> factory) : IClassFixture<WebApplicationFactory<Program>>
+public class UploadTests() : IClassFixture<WebApplicationFactory<Program>>
 {
     public class FileControllerTests : IClassFixture<WebApplicationFactory<Program>>
     {
