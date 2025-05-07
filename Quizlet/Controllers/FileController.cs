@@ -1,17 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using Quizlet.Interfaces;
-
+using Quizlet.Models;
 namespace Quizlet.Controllers
 {
     [ApiController]
     [Route("api/files")]
     public class FileController : ControllerBase
     {
+        private readonly ICardDeckGenerationService _cardDeckGenerationService;
         private readonly IFileService _fileService;
 
-        public FileController(IFileService fileService)
+        public FileController(IFileService fileService, ICardDeckGenerationService cardDeckGenerationService)
         {
             _fileService = fileService;
+            _cardDeckGenerationService = cardDeckGenerationService;
         }
 
         [HttpPost]
@@ -23,6 +25,7 @@ namespace Quizlet.Controllers
                 Console.WriteLine("No file uploaded.");
                 return BadRequest(new { message = "No file uploaded." });
             }
+            Console.WriteLine(formFile.FileName);
 
             // Validate the file type
             var allowedExtensions = new[] { ".txt", ".pdf", ".docx" };
@@ -59,7 +62,8 @@ namespace Quizlet.Controllers
                     System.IO.File.Delete(tempFilePath);
             }
             // Return the content
-            return Ok(new { content });
+            CardDeck cardDeck = await _cardDeckGenerationService.GenerateCardsFromTextAsync(content);
+            return Ok(cardDeck);
         }
     }
 }

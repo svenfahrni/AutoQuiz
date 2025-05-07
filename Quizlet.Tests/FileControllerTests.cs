@@ -5,20 +5,24 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 using System.IO;
+using System.Text.Json;
+using Quizlet.Models;
 
 namespace Quizlet.Tests
 {
-    public class UploadTests : IClassFixture<WebApplicationFactory<Program>>
+    public class FileControllerTests : IClassFixture<WebApplicationFactory<Program>>
     {
+        private readonly WebApplicationFactory<Program> _factory;
         private readonly HttpClient _client;
 
-        public UploadTests(WebApplicationFactory<Program> factory)
+        public FileControllerTests()
         {
-            _client = factory.CreateClient();
+            _factory = TestSetup.CreateTestApplication();
+            _client = _factory.CreateClient();
         }
 
         [Fact]
-        public async Task UploadFile_ShouldReturnText_WhenTxtFileIsProvided()
+        public async Task UploadFile_ShouldReturnCards_WhenTxtFileIsProvided()
         {
             // Create fake file content
             var text = "Hello, world!";
@@ -29,12 +33,15 @@ namespace Quizlet.Tests
 
             // Act
             var response = await _client.PostAsync("/api/files/", content);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<CardDeck>(responseContent);
 
             // Assert
             response.EnsureSuccessStatusCode();
-            var responseText = await response.Content.ReadAsStringAsync();
-            Console.WriteLine(responseText);
-            Assert.Contains(text, responseText);
+            Assert.NotNull(result);
+            Assert.NotNull(result?.Title);
+            Assert.Equal("Test Deck", result?.Title);
+            Assert.Equal(2, result?.Cards.Count);
         }
 
         [Fact]
@@ -66,8 +73,5 @@ namespace Quizlet.Tests
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
         }
-
-
     }
-
 }
