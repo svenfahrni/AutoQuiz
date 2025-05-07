@@ -1,55 +1,48 @@
 using Microsoft.AspNetCore.Mvc;
 using Quizlet.Interfaces;
 using Quizlet.Models;
-namespace Quizlet.Controllers
-{
-    [ApiController]
-    [Route("api/files")]
-    public class FileController : ControllerBase
-    {
-        private readonly ICardDeckGenerationService _cardDeckGenerationService;
-        private readonly IFileService _fileService;
 
-        public FileController(IFileService fileService, ICardDeckGenerationService cardDeckGenerationService)
+namespace Quizlet.Controllers;
+
+[ApiController]
+[Route("api/files")]
+public class FileController(IFileService fileService, ICardDeckGenerationService cardDeckGenerationService) : ControllerBase
+{
+    [HttpPost]
+    public async Task<IActionResult> UploadFile(IFormFile? formFile)
+    {
+        // Validate the content
+        if (formFile == null || formFile.Length == 0)
         {
-            _fileService = fileService;
-            _cardDeckGenerationService = cardDeckGenerationService;
+            Console.WriteLine("No file uploaded.");
+            return BadRequest(new { message = "No file uploaded." });
         }
 
-        [HttpPost]
-        public async Task<IActionResult> UploadFile(IFormFile formFile)
+        // Validate the file type
+        var allowedExtensions = new[] { ".txt", ".pdf", ".docx" };
+        var fileExtension = Path.GetExtension(formFile.FileName).ToLowerInvariant();
+        if (!allowedExtensions.Contains(fileExtension))
         {
-            // Validate the content
-            if (formFile == null || formFile.Length == 0) 
-            {
-                Console.WriteLine("No file uploaded.");
-                return BadRequest(new { message = "No file uploaded." });
-            }
-            Console.WriteLine(formFile.FileName);
+            Console.WriteLine("Invalid file type. Only .txt, .pdf, and .docx files are allowed.");
+            return BadRequest(new { message = "Invalid file type. Only .txt, .pdf, and .docx files are allowed." });
+        }
 
-            // Validate the file type
-            var allowedExtensions = new[] { ".txt", ".pdf", ".docx" };
-            var fileExtension = Path.GetExtension(formFile.FileName).ToLower();
-            if (!allowedExtensions.Contains(fileExtension)) 
-            {
-                Console.WriteLine("Invalid file type. Only .txt, .pdf, and .docx files are allowed.");
-                return BadRequest(new { message = "Invalid file type. Only .txt, .pdf, and .docx files are allowed." });
-            }
+        var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
+        var tempFilePath = Path.Combine(Path.GetTempPath(), uniqueFileName);
 
-            // Save the file to a temporary location
-            var safeFileName = Path.GetFileName(formFile.FileName);
-            var uniqueFileName = $"{Guid.NewGuid()}_{safeFileName}";
-            var tempFilePath = Path.Combine(Path.GetTempPath(), uniqueFileName);
-            using (var stream = new FileStream(tempFilePath, FileMode.Create))
+        try
+        {
+            await using (var stream = new FileStream(tempFilePath, FileMode.CreateNew))
             {
                 await formFile.CopyToAsync(stream);
             }
 
+            CardDeck cardDeck;
             // Read the file content
-            string content;
             try
             {
-                content = await _fileService.ReadFileContentAsync(tempFilePath);
+                string content = await fileService.ReadFileContentAsync(tempFilePath);
+                cardDeck = await cardDeckGenerationService.GenerateCardsFromTextAsync(content);
             }
             catch (Exception ex)
             {
@@ -61,9 +54,18 @@ namespace Quizlet.Controllers
                 if (System.IO.File.Exists(tempFilePath))
                     System.IO.File.Delete(tempFilePath);
             }
+
             // Return the content
-            CardDeck cardDeck = await _cardDeckGenerationService.GenerateCardsFromTextAsync(content);
             return Ok(cardDeck);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"File processing failed: {ex.Message}");
+            return BadRequest(new { message = ex.Message });
+        }
+        finally
+        {
+            if (System.IO.File.Exists(tempFilePath)) System.IO.File.Delete(tempFilePath);
         }
     }
 }

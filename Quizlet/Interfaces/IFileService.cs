@@ -1,7 +1,6 @@
-namespace Quizlet.Interfaces
+namespace Quizlet.Interfaces;
+
+public interface IFileService
 {
-    public interface IFileService
-    {
-        Task<string> ReadFileContentAsync(string filePath);
-    }
+    Task<string> ReadFileContentAsync(string filePath);
 }

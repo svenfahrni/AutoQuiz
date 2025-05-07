@@ -1,0 +1,39 @@
+name: .NET Build, Lint, and Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
+      - name: Run dotnet format (lint)
+        run: dotnet format quizlet.sln --verify-no-changes
+
+      - name: Restore solution dependencies
+        run: dotnet restore quizlet.sln
+
+      - name: Build solution
+        run: dotnet build quizlet.sln --no-restore --configuration Release
+
+      - name: Run tests
+        run: dotnet test ./Quizlet.Tests/Quizlet.Tests.csproj --no-build --configuration Release --logger trx --results-directory TestResults

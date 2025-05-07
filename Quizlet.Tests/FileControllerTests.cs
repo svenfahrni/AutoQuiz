@@ -1,14 +1,12 @@
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Xunit;
-using System.IO;
 using System.Text.Json;
 using Quizlet.Models;
 
-namespace Quizlet.Tests
+namespace Quizlet.Tests;
+
+public class UploadTests(WebApplicationFactory<Program> factory) : IClassFixture<WebApplicationFactory<Program>>
 {
     public class FileControllerTests : IClassFixture<WebApplicationFactory<Program>>
     {

@@ -1,158 +1,148 @@
-﻿using DocumentFormat.OpenXml.Packaging;
+﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
-using Quizlet.Interfaces;
 using Quizlet.Services;
 
-namespace Quizlet.Tests
+namespace Quizlet.Tests;
+
+public class FileServiceTests
 {
-    public class FileServiceTests
+    private readonly FileService _fileService = new();
+
+    [Fact]
+    public async Task ReadFileContentAsync_ShouldThrowArgumentException_WhenFilePathIsNullOrEmpty()
     {
-        private readonly IFileService _fileService;
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(() => _fileService.ReadFileContentAsync(null));
+        await Assert.ThrowsAsync<ArgumentException>(() => _fileService.ReadFileContentAsync(string.Empty));
+    }
 
-        public FileServiceTests()
-        {
-            _fileService = new FileService();
-        }
+    [Fact]
+    public async Task ReadFileContentAsync_ShouldThrowFileNotFoundException_WhenFileDoesNotExist()
+    {
+        // Arrange
+        var nonExistentFilePath = "nonexistentfile.txt";
 
-        [Fact]
-        public async Task ReadFileContentAsync_ShouldThrowArgumentException_WhenFilePathIsNullOrEmpty()
-        {
-            // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => _fileService.ReadFileContentAsync(null));
-            await Assert.ThrowsAsync<ArgumentException>(() => _fileService.ReadFileContentAsync(string.Empty));
-        }
+        // Act & Assert
+        await Assert.ThrowsAsync<FileNotFoundException>(() => _fileService.ReadFileContentAsync(nonExistentFilePath));
+    }
 
-        [Fact]
-        public async Task ReadFileContentAsync_ShouldThrowFileNotFoundException_WhenFileDoesNotExist()
-        {
-            // Arrange
-            var nonExistentFilePath = "nonexistentfile.txt";
+    [Fact]
+    public async Task ReadFileContentAsync_ShouldReturnContent_ForTxtFile()
+    {
+        // Arrange
+        var filePath = "testfile.txt";
+        var expectedContent = "Dies ist ein Testinhalt.";
+        await File.WriteAllTextAsync(filePath, expectedContent);
 
-            // Act & Assert
-            await Assert.ThrowsAsync<FileNotFoundException>(() => _fileService.ReadFileContentAsync(nonExistentFilePath));
-        }
+        // Act
+        var content = await _fileService.ReadFileContentAsync(filePath);
 
-        [Fact]
-        public async Task ReadFileContentAsync_ShouldReturnContent_ForTxtFile()
-        {
-            // Arrange
-            var filePath = "testfile.txt";
-            var expectedContent = "Dies ist ein Testinhalt.";
-            await File.WriteAllTextAsync(filePath, expectedContent);
+        // Assert
+        Assert.Equal(expectedContent, content);
 
-            // Act
-            var content = await _fileService.ReadFileContentAsync(filePath);
+        // Cleanup
+        File.Delete(filePath);
+    }
 
-            // Assert
-            Assert.Equal(expectedContent, content);
+    [Fact]
+    public async Task ReadFileContentAsync_ShouldReturnContent_ForDocxFile()
+    {
+        // Arrange
+        var filePath = "testfile.docx";
+        var expectedContent = "Dies ist ein Testinhalt.";
+        CreateDocxFile(filePath, expectedContent);
 
-            // Cleanup
-            File.Delete(filePath);
-        }
+        // Act
+        var content = await _fileService.ReadFileContentAsync(filePath);
 
-        [Fact]
-        public async Task ReadFileContentAsync_ShouldReturnContent_ForDocxFile()
-        {
-            // Arrange
-            var filePath = "testfile.docx";
-            var expectedContent = "Dies ist ein Testinhalt.";
-            CreateDocxFile(filePath, expectedContent);
+        // Assert
+        Assert.Equal(expectedContent, content);
 
-            // Act
-            var content = await _fileService.ReadFileContentAsync(filePath);
-
-            // Assert
-            Assert.Equal(expectedContent, content);
-
-            // Cleanup
-            File.Delete(filePath);
-        }
+        // Cleanup
+        File.Delete(filePath);
+    }
 
 
-        [Fact]
-        public async Task ReadFileContentAsync_ShouldReturnContent_ForPdfFile()
-        {
-            // Arrange
-            var filePath = "testfile.pdf";
-            var expectedContent = "Dies ist ein Testinhalt.";
-            CreatePdfFile(filePath, expectedContent);
+    [Fact]
+    public async Task ReadFileContentAsync_ShouldReturnContent_ForPdfFile()
+    {
+        // Arrange
+        var filePath = "testfile.pdf";
+        var expectedContent = "Dies ist ein Testinhalt.";
+        CreatePdfFile(filePath, expectedContent);
 
-            // Act
-            var content = await _fileService.ReadFileContentAsync(filePath);
+        // Act
+        var content = await _fileService.ReadFileContentAsync(filePath);
 
-            // Assert
-            Assert.Equal(expectedContent, content);
+        // Assert
+        Assert.Equal(expectedContent, content);
 
-            // Cleanup
-            File.Delete(filePath);
-        }
+        // Cleanup
+        File.Delete(filePath);
+    }
 
-        [Fact]
-        public async Task ReadFileContentAsync_ShouldThrowNotSupportedException_WhenFileTypeIsNotSupported()
-        {
-            // Arrange
-            var filePath = "testfile.invalidfileformat";
-            await File.WriteAllTextAsync(filePath, "Test content");
+    [Fact]
+    public async Task ReadFileContentAsync_ShouldThrowNotSupportedException_WhenFileTypeIsNotSupported()
+    {
+        // Arrange
+        var filePath = "testfile.invalidfileformat";
+        await File.WriteAllTextAsync(filePath, "Test content");
 
-            // Act & Assert
-            await Assert.ThrowsAsync<NotSupportedException>(() => _fileService.ReadFileContentAsync(filePath));
+        // Act & Assert
+        await Assert.ThrowsAsync<NotSupportedException>(() => _fileService.ReadFileContentAsync(filePath));
 
-            // Cleanup
-            File.Delete(filePath);
-        }
+        // Cleanup
+        File.Delete(filePath);
+    }
 
-        [Fact]
-        public async Task ReadFileContentAsync_ShouldThrowInvalidOperationException_WhenDocxFileStructureIsInvalid()
-        {
-            // Arrange
-            var filePath = "invalidfile.docx";
-            CreateDocxFileWithInvalidStructure(filePath);
+    [Fact]
+    public async Task ReadFileContentAsync_ShouldThrowInvalidOperationException_WhenDocxFileStructureIsInvalid()
+    {
+        // Arrange
+        var filePath = "invalidfile.docx";
+        CreateDocxFileWithInvalidStructure(filePath);
 
-            // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => _fileService.ReadFileContentAsync(filePath));
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _fileService.ReadFileContentAsync(filePath));
 
-            // Cleanup
-            File.Delete(filePath);
-        }
+        // Cleanup
+        File.Delete(filePath);
+    }
 
 
-        private static void CreateDocxFile(string filePath, string content)
-        {
-            using (var doc = WordprocessingDocument.Create(filePath, DocumentFormat.OpenXml.WordprocessingDocumentType.Document))
-            {
-                var mainPart = doc.AddMainDocumentPart();
-                mainPart.Document = new DocumentFormat.OpenXml.Wordprocessing.Document();
-                var body = mainPart.Document.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Body());
-                var para = body.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Paragraph());
-                var run = para.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run());
-                run.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Text(content));
-            }
-        }
+    private static void CreateDocxFile(string filePath, string content)
+    {
+        using var doc = WordprocessingDocument.Create(filePath, WordprocessingDocumentType.Document);
+        var mainPart = doc.AddMainDocumentPart();
+        mainPart.Document = new Document();
+        var body = mainPart.Document.AppendChild(new Body());
+        var para = body.AppendChild(new Paragraph());
+        var run = para.AppendChild(new Run());
+        run.AppendChild(new Text(content));
+    }
 
-        private static void CreateDocxFileWithInvalidStructure(string filePath)
-        {
-            using (var doc = WordprocessingDocument.Create(filePath, DocumentFormat.OpenXml.WordprocessingDocumentType.Document))
-            {
-                var mainPart = doc.AddMainDocumentPart();
-                mainPart.Document = new DocumentFormat.OpenXml.Wordprocessing.Document();
-                // Intentionally not adding a body to create an invalid structure
-            }
-        }
+    private static void CreateDocxFileWithInvalidStructure(string filePath)
+    {
+        using var doc = WordprocessingDocument.Create(filePath, WordprocessingDocumentType.Document);
+        var mainPart = doc.AddMainDocumentPart();
+        mainPart.Document = new Document();
+        // Intentionally not adding a body to create an invalid structure
+    }
 
-        private static void CreatePdfFile(string filePath, string content)
-        {
-            PdfDocument document = new PdfDocument();
-            document.Info.Title = "Test Document";
-            PdfPage page = document.AddPage();
-            XGraphics gfx = XGraphics.FromPdfPage(page);
-            XFont font = new XFont("Verdana", 12);
-            String paragraph = content;
-            gfx.DrawString(paragraph, font, XBrushes.Black,
-                new XPoint(20, 20), 
-                XStringFormats.TopLeft);
-            document.Save(filePath);
-            document.Close();
-        }
+    private static void CreatePdfFile(string filePath, string content)
+    {
+        var document = new PdfDocument();
+        document.Info.Title = "Test Document";
+        var page = document.AddPage();
+        var gfx = XGraphics.FromPdfPage(page);
+        var font = new XFont("Verdana", 12);
+        gfx.DrawString(content, font, XBrushes.Black,
+            new XPoint(20, 20),
+            XStringFormats.TopLeft);
+        document.Save(filePath);
+        document.Close();
     }
 }
