@@ -7,7 +7,7 @@ namespace Quizlet.Models
         [JsonPropertyName("front")]
         public string Front { get; set; }
 
-        [JsonPropertyName("back")] 
+        [JsonPropertyName("back")]
         public string Back { get; set; }
 
         public Card()
