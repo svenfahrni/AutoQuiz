@@ -17,7 +17,7 @@ C4Context
     Rel(user, quizlet, "Uses", "HTTPS")
     Rel(quizlet, openai, "Uses", "HTTPS/API")
     
-    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
+    UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
 ```
 
 This context diagram illustrates Quizlet's core interactions: Users interact with the Quizlet system through a web interface, while the system itself leverages OpenAI's language model capabilities to automatically generate flashcards from text input. The diagram emphasizes that Quizlet is primarily a user-facing application with an AI-powered content generation feature, making it clear that the system's main value proposition is the combination of user interaction and AI-assisted content creation.
