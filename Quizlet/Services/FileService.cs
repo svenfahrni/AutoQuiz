@@ -11,7 +11,7 @@ public class FileService : IFileService
         _fileReaderStrategies = fileReaderStrategies;
     }
 
-    public async Task<string> ReadFileContentAsync(string filePath)
+    public string ReadFileContent(string filePath)
     {
         if (string.IsNullOrEmpty(filePath))
             throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));
@@ -25,6 +25,6 @@ public class FileService : IFileService
         if (strategy == null)
             throw new NotSupportedException($"Extension '{extension}' isn't supported.");
 
-        return await strategy.ReadFileContentAsync(filePath);
+        return strategy.ReadFileContent(filePath);
     }
 }

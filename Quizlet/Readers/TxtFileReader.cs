@@ -6,9 +6,9 @@ namespace Quizlet.Readers
     {
         public bool CanHandle(string fileExtension) => fileExtension.Equals(".txt", StringComparison.OrdinalIgnoreCase);
 
-        public async Task<string> ReadFileContentAsync(string filePath)
+        public string ReadFileContent(string filePath)
         {
-            return await File.ReadAllTextAsync(filePath);
+            return File.ReadAllText(filePath);
         }
     }
 }

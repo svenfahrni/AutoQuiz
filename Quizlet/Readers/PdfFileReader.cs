@@ -8,7 +8,7 @@ namespace Quizlet.Readers
     {
         public bool CanHandle(string fileExtension) => fileExtension.Equals(".pdf", StringComparison.OrdinalIgnoreCase);
 
-        public async Task<string> ReadFileContentAsync(string filePath)
+        public string ReadFileContent(string filePath)
         {
             var text = new StringBuilder();
 

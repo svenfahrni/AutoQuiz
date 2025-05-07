@@ -8,7 +8,7 @@ namespace Quizlet.Readers
     {
         public bool CanHandle(string fileExtension) => fileExtension.Equals(".docx", StringComparison.OrdinalIgnoreCase);
 
-        public async Task<string> ReadFileContentAsync(string filePath)
+        public string ReadFileContent(string filePath)
         {
             using var doc = WordprocessingDocument.Open(filePath, false);
             if (doc.MainDocumentPart?.Document?.Body == null)
@@ -17,7 +17,7 @@ namespace Quizlet.Readers
             var content = string.Join(Environment.NewLine, doc.MainDocumentPart.Document.Body.Elements<Paragraph>()
                 .Select(p => p.InnerText));
 
-            return await Task.FromResult(content);
+            return content;
         }
     }
 }

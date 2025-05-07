@@ -3,6 +3,6 @@
     public interface IFileReaderStrategy
     {
         bool CanHandle(string fileExtension);
-        Task<string> ReadFileContentAsync(string filePath);
+        string ReadFileContent(string filePath);
     }
 }

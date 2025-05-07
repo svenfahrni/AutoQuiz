@@ -36,7 +36,7 @@ public class FileController(IFileService fileService) : ControllerBase
                 await formFile.CopyToAsync(stream);
             }
 
-            var content = await fileService.ReadFileContentAsync(tempFilePath);
+            var content = fileService.ReadFileContent(tempFilePath);
 
             return Ok(new { content });
         }
