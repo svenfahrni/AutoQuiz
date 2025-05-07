@@ -1,14 +1,12 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { useDeckStore } from '@/stores/deck'
 
-// Demo data - replace with actual data from backend
-const currentSet = ref('Spanisch Vokabeln')
-const cards = ref([
-  { id: 1, front: 'Was ist die Hauptstadt von Frankreich?', back: 'Paris' },
-  { id: 2, front: 'Was gibt 2 + 2?', back: '4' },
-  { id: 3, front: 'Welche Frabe hat Globi?', back: 'Blue' },
-  { id: 4, front: 'Welches ist der grösse Planet?', back: 'Jupiter' },
-])
+const deckStore = useDeckStore()
+
+const currentSet = ref(deckStore.currentDeck.name)
+const cards = ref(deckStore.currentDeck.cards)
 
 const currentIndex = ref(0)
 const showAnswer = ref(false)
