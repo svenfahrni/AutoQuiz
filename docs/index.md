@@ -14,8 +14,8 @@ C4Context
     
     System_Ext(openai, "OpenAI", "Hosted LLM to generate Flashcards from Text.")
     
-    Rel(user, quizlet, "Uses", "HTTPS")
-    Rel(quizlet, openai, "Uses", "HTTPS/API")
+    Rel(user, quizlet, "Uploads text, generates cards, learns from cards.", "HTTPS")
+    Rel(quizlet, openai, "Generates Flashcards using", "HTTPS/API")
     
     UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
 ```
