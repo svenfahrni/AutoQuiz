@@ -41,7 +41,7 @@ public class FileController(IFileService fileService, ICardDeckGenerationService
             // Read the file content
             try
             {
-                string content = await fileService.ReadFileContentAsync(tempFilePath);
+                string content = fileService.ReadFileContent(tempFilePath);
                 cardDeck = await cardDeckGenerationService.GenerateCardsFromTextAsync(content);
             }
             catch (Exception ex)
