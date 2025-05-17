@@ -1,5 +1,6 @@
 using Microsoft.OpenApi.Models;
 using Quizlet.Interfaces;
+using Quizlet.Readers;
 using Quizlet.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,11 @@ builder.Services.AddHealthChecks();
 
 // Register Services
 builder.Services.AddScoped<IFileService, FileService>();
+
+// Register Readers
+builder.Services.AddTransient<IFileReaderStrategy, TxtFileReader>();
+builder.Services.AddTransient<IFileReaderStrategy, PdfFileReader>();
+builder.Services.AddTransient<IFileReaderStrategy, DocxFileReader>();
 
 var app = builder.Build();
 
