@@ -18,6 +18,7 @@ builder.Services.AddHealthChecks();
 
 // Register Services
 builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<ICardDeckGenerationService, CardDeckGenerationServiceOpenAI>();
 
 // Register Readers
 builder.Services.AddTransient<IFileReaderStrategy, TxtFileReader>();
@@ -35,7 +36,7 @@ if (app.Environment.IsDevelopment())
 app.UseStaticFiles();
 app.UseDefaultFiles();
 app.MapFallbackToFile("index.html");
-
+app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
