@@ -16,18 +16,5 @@ namespace Quizlet.Models
             Title = string.Empty;
             Cards = new List<Card>();
         }
-
-        public CardDeck(string title)
-        {
-            Title = title;
-            Cards = new List<Card>();
-        }
-
-        public CardDeck(string title, List<Card> cards)
-        {
-            Title = title;
-            Cards = cards;
-        }
-
     }
 }

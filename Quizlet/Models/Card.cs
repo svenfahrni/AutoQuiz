@@ -15,11 +15,5 @@ namespace Quizlet.Models
             Front = string.Empty;
             Back = string.Empty;
         }
-
-        public Card(string front, string back)
-        {
-            Front = front;
-            Back = back;
-        }
     }
 }
