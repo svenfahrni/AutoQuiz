@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Quizlet.Interfaces;
+using Quizlet.Models;
 
 namespace Quizlet.Controllers;
 
 [ApiController]
 [Route("api/files")]
-public class FileController(IFileService fileService) : ControllerBase
+public class FileController(IFileService fileService, ICardDeckGenerationService cardDeckGenerationService) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> UploadFile(IFormFile? formFile)
@@ -36,9 +37,26 @@ public class FileController(IFileService fileService) : ControllerBase
                 await formFile.CopyToAsync(stream);
             }
 
-            var content = fileService.ReadFileContent(tempFilePath);
+            CardDeck cardDeck;
+            // Read the file content
+            try
+            {
+                string content = fileService.ReadFileContent(tempFilePath);
+                cardDeck = await cardDeckGenerationService.GenerateCardsFromTextAsync(content);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            finally
+            {
+                // Clean up the temporary file
+                if (System.IO.File.Exists(tempFilePath))
+                    System.IO.File.Delete(tempFilePath);
+            }
 
-            return Ok(new { content });
+            // Return the content
+            return Ok(cardDeck);
         }
         catch (Exception ex)
         {
